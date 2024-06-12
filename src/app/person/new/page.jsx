@@ -1,6 +1,6 @@
 'use client';
 
-import { save } from '@/hooks/Services_persona';
+import { all_civil, save } from '@/hooks/Services_persona';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,8 +9,22 @@ import swal from 'sweetalert';
 import Cookies from 'js-cookie';
 import Menu from '../../components/menu/menu';
 import Link from 'next/link';
+import { useState } from 'react';
 
-export default function Person() {
+export default function New() {
+  //const router= useRouter()
+
+  let[estado_civil,setEstado_civil]=useState(null);
+  let[estado,setEstado]=useState(false);
+  if (!estado){
+    all_civil().then((info)=>{
+      if(info.code=200){
+        setEstado_civil(info.datos);
+      }
+    });
+    setEstado(true); 
+  }
+
   const validationSchema = Yup.object().shape({
     nombres: Yup.string().trim().required('ESCRIBA LOS NOMBRES'),
     apellidos: Yup.string().trim().required('ESCRIBA LOS APELLIDOS'),
@@ -26,7 +40,10 @@ export default function Person() {
 
   const sendInfo = (data) => {
     //data.fecha_nac = new Date(data.fecha_nac).toISOString().split('T')[0];
+
     //console.log(data.fecha_nac)
+
+
     save(data,token).then((info) => {
       if (info.code =='200') {
         console.log(info);
@@ -34,7 +51,7 @@ export default function Person() {
         //Cookies.set('usuario',info.datos.user);
           swal({
             title: "CORRECTO",
-            text: "GUARDADO",
+            text: info.datos.tag,
             icon: "success",
             button: "Accept",
             timer: 4000,
@@ -87,13 +104,12 @@ export default function Person() {
             <label htmlFor="estadoCivil" className="form-label">
               Estado Civil
             </label>
-            <select className="form-control" id="estadoCivil" {...register('estadoCivil')}>
-              <option value="SOLTERO">SOLTERO</option>
-              <option value="CASADO">CASADO</option>
-              <option value="DIVORCIADO">DIVORCIADO</option>
-              <option value="VIUDO">VIUDO</option>
+            <select className="form-control" name="estado" {...register('estadoCivil')}>
+              <option value="">SELECCIONE UN ESTADO</option>
+              {estado_civil && estado_civil.map((dato,i)=>(
+                <option value = {dato.key}>{dato.value}</option>
+              ))}
             </select>
-            {errors.estadoCivil && <div className="text-xs inline-block py-1 px-2 rounded text-red-600">{errors.estadoCivil?.message}</div>}
           </div>
           <div className="col-md-6">
             <label htmlFor="fecha_nac" className="form-label">

@@ -23,12 +23,12 @@ return (
 <ul className="hidden md:flex gap-x-6 text-white">
 <li>
 <Link href="/person">
-<p>About Us</p>
+<p>Listar Personas</p>
 </Link>
 </li>
 <li>
-<Link href="/services">
-<p>Services</p>
+<Link href="/person/search">
+<p>Buscar para censar</p>
 </Link>
 </li>
 <li>
